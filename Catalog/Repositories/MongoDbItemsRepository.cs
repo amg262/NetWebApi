@@ -1,4 +1,5 @@
 ﻿using Catalog.Entities;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Catalog.Repositories;
@@ -10,10 +11,8 @@ public class MongoDbItemsRepository : IItemsRepository
     // Saving info to connect to db
     private const string databaseName = "catalog";
     private const string collectionName = "items";
-
-
     private readonly IMongoCollection<Item> itemsCollection;
-
+    private readonly FilterDefinitionBuilder<Item> filterBuilder = Builders<Item>.Filter; // This is a helper to build filters
     public MongoDbItemsRepository(IMongoClient mongoClient)
     {
         // Driver will create db if it doesnt exist
@@ -26,12 +25,14 @@ public class MongoDbItemsRepository : IItemsRepository
 
     public IEnumerable<Item> GetItems()
     {
-        throw new NotImplementedException();
+        // Find() returns a cursor, which is a pointer to the data
+        return itemsCollection.Find(new BsonDocument()).ToList(); 
     }
 
     public Item GetItem(Guid id)
     {
-        throw new NotImplementedException();
+        var filter = filterBuilder.Eq(item => item.Id, id); // Filter that will return the item with matching id
+        return itemsCollection.Find(filter).SingleOrDefault(); // This will return the item with the matching id
     }
 
     public void CreateItem(Item item)
@@ -57,7 +58,7 @@ public class MongoDbItemsRepository : IItemsRepository
         
         // Everything is packaged in docker image - when you run it, it will create a container
         // Docker container will run in docker engine
-        // 
+        
         itemsCollection.InsertOne(item);
     }
 
