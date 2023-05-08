@@ -27,22 +27,24 @@ namespace Catalog
             BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
             var mongoDbSettings = Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
 
+            // var mongoDbSettings2 = Configuration.GetSection(MongoDbSettings).Get<MongoDbSettings>();
+            // var mongoDbSetting3s = Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
+            var mongoDbSettings24 = services.Configure<MongoDbSettings>(Configuration.GetSection("ConnectionString"));
             services.AddSingleton<IMongoClient>(serviceProvider =>
             {
-                return new MongoClient("mongodb://localhost:27017");
+                return new MongoClient(mongoDbSettings?.ConnectionString);
             });
+
+
+            // services.AddSingleton<IMongoClient>(serviceProvider =>
+            // {
+            //     return new MongoClient("mongodb://localhost:27017");
+            // });
 
             services.AddSingleton<IItemsRepository, MongoDbItemsRepository>();
 
-            services.AddControllers(options =>
-            {
-                options.SuppressAsyncSuffixInActionNames = false;
-            });
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Catalog", Version = "v1" });
-            });
-            
+            services.AddControllers(options => { options.SuppressAsyncSuffixInActionNames = false; });
+            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Catalog", Version = "v1"}); });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,10 +66,7 @@ namespace Catalog
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }
