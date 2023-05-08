@@ -11,28 +11,28 @@ namespace Catalog.Controllers;
 // [Route("api/v{version:apiVersion}/[controller]")]
 public class ItemsController : ControllerBase
 {
-    private readonly IItemsRepository repository;
+    private readonly IItemsRepository _repository;
 
     // Dependency Injection
     public ItemsController(IItemsRepository repository)
     {
-        this.repository = repository;
+        this._repository = repository;
     }
 
     // GET /items
     [HttpGet]
-    public IEnumerable<ItemDto> GetItems()
+    public async Task<IEnumerable<ItemDto>> GetItemsAsync()
     {
-        var items = repository.GetItems().Select(item => item.AsDto());
+        var items = (await _repository.GetItemsAsync()).Select(item => item.AsDto()); // Do the first task and then the second task
         return items; // 200
     }
 
     // GET /items/{id}
     // [HttpGet("{id:guid}")] - this will make sure the id is a guid but for testing we wont use it here
-    [HttpGet("{id}")]
-    public ActionResult<ItemDto> GetItem(Guid id)
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<ItemDto>> GetItemAsync(Guid id)
     {
-        var item = repository.GetItem(id);
+        var item = await _repository.GetItemAsync(id);
 
         if (item is null)
         {
@@ -44,7 +44,7 @@ public class ItemsController : ControllerBase
 
     // POST /items
     [HttpPost]
-    public ActionResult<ItemDto> CreateItem(CreateItemDto itemDto)
+    public async Task<ActionResult<ItemDto>> CreateItemAsync(CreateItemDto itemDto)
     {
         Item item = new()
         {
@@ -54,19 +54,24 @@ public class ItemsController : ControllerBase
             CreatedDate = DateTimeOffset.UtcNow
         };
 
-        repository.CreateItem(item);
+        await _repository.CreateItemAsync(item);
+        
+        // We need to pass the action name to CreatedAtAction() in this way
+        // If we use CreatedAtRoute() we dont need to pass the action name or use this
+        // But CreateAtRoute wasn't working for me
+        var action = nameof(GetItemAsync); 
 
         // Can use CreatedAtAction() or CreatedAtRoute()
-        //return CreatedAtRoute(nameof(GetItem), new {id = item.Id}, item.AsDto());
-        return CreatedAtAction(nameof(GetItem), new {id = item.Id}, item.AsDto()); // 201
+        //return CreatedAtRoute(action, new {id = item.Id}, item.AsDto());
+        return CreatedAtAction(action, new {id = item.Id}, item.AsDto()); // 201
     }
 
     // PUT /items/{id}
     // [HttpPut("{id:guid}")] - this will make sure the id is a guid but for testing we wont use it here
-    [HttpPut("{id}")]
-    public ActionResult UpdateItem(Guid id, UpdateItemDto itemDto)
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult> UpdateItemAsync(Guid id, UpdateItemDto itemDto)
     {
-        var existingItem = repository.GetItem(id);
+        var existingItem = await _repository.GetItemAsync(id);
 
         if (existingItem is null)
         {
@@ -81,7 +86,7 @@ public class ItemsController : ControllerBase
             Price = itemDto.Price
         };
 
-        repository.UpdateItem(updatedItem);
+        await _repository.UpdateItemAsync(updatedItem);
 
         // It is convention to return NoContent() when updating
         return NoContent(); // 204
@@ -89,19 +94,21 @@ public class ItemsController : ControllerBase
 
     // DELETE /items/{id}
     // [HttpDelete("{id:guid}")] - this will make sure the id is a guid but for testing we wont use it here
-    [HttpDelete("{id}")]
-    public ActionResult DeleteItem(Guid id)
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult> DeleteItem(Guid id)
     {
-        var existingItem = repository.GetItem(id);
+        var existingItem = await _repository.GetItemAsync(id); // Get the item first
 
         if (existingItem is null)
         {
             return NotFound(); // 404
         }
 
-        repository.DeleteItem(id);
+        await _repository.DeleteItemAsync(id); // Delete the item
 
         // It is convention to return NoContent() when deleting
         return NoContent(); // 204
     }
+
+
 }

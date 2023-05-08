@@ -9,7 +9,8 @@ using MongoDB.Driver;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+// This is to make sure that the controller methods end with Async - otherwise it'll strip them out
+builder.Services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
 
 
 // Might end up with not good representation of data in db - so we need to tell mongo how to serialize the Guid data (string)
@@ -63,6 +64,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+//app.MapDefaultControllerRoute();
+app.UseCors("Local");
 app.MapControllers();
 
 app.Run();

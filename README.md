@@ -22,3 +22,9 @@ This worked for a separate D:\ location and on Windows Server 2019
 -p is opening a port to map to the container
 -v is volume, which is a way to persist data. mongodbdata is the name of the volume, and /data/db is the path inside the container
 docker ps -- checks if its running
+
+
+### Aysnchronous Programming
+https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/async/
+
+Async all the way from controller to repository to database
