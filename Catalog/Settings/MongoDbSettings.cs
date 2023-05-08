@@ -2,7 +2,7 @@
 
 public class MongoDbSettings
 {
-    // Name of the database
+    // Localhost is the default host
     public string Host { get; set; }
 
     // MongoDb uses port 27017 by default

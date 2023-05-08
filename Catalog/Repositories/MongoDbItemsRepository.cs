@@ -37,38 +37,18 @@ public class MongoDbItemsRepository : IItemsRepository
 
     public void CreateItem(Item item)
     {
-        // You can install the db with mongodb installer, or you can use docker
-        
-        // THESE COMMANDS ARE FOR INITIAL SETUP OF MONGODB --------------------------------------
-        
-        // docker run -d --rm --name mongo -p 27017:27017 -v mongodbdata:/data/db mongo
-        // -d --rm doesnt attach - and rm means its destoryed when you stop it. -p is opening a port to map to the container
-        // -v is volume, which is a way to persist data. mongodbdata is the name of the volume, and /data/db is the path inside the container
-        // docker ps -- checks if its running
-        
-        // docker exec -it mongo bash
-        // mongo
-        // show dbs
-        // use catalog
-        // show collections
-        // db.items.find()
-        // db.items.insertOne({name: "Potion", price: 9.99})
-        // db.items.find()
-        // db.items.deleteOne({name: "Potion"})
-        
-        // Everything is packaged in docker image - when you run it, it will create a container
-        // Docker container will run in docker engine
-        
         itemsCollection.InsertOne(item);
     }
 
     public void UpdateItem(Item item)
     {
-        throw new NotImplementedException();
+        var filter = filterBuilder.Eq(existingItem => existingItem.Id, item.Id); // Filter that will return the item with matching id
+        itemsCollection.ReplaceOne(filter, item); // This will replace the item with the matching id
     }
 
     public void DeleteItem(Guid id)
     {
-        throw new NotImplementedException();
+        var filter = filterBuilder.Eq(item => item.Id, id); // Filter that will return the item with matching id
+        itemsCollection.DeleteOne(filter); // This will delete the item with the matching id
     }
 }
