@@ -23,7 +23,8 @@ public class ItemsController : ControllerBase
     [HttpGet]
     public async Task<IEnumerable<ItemDto>> GetItemsAsync()
     {
-        var items = (await _repository.GetItemsAsync()).Select(item => item.AsDto()); // Do the first task and then the second task
+        var items = (await _repository.GetItemsAsync()).Select(item =>
+            item.AsDto()); // Do the first task and then the second task
         return items; // 200
     }
 
@@ -55,11 +56,11 @@ public class ItemsController : ControllerBase
         };
 
         await _repository.CreateItemAsync(item);
-        
+
         // We need to pass the action name to CreatedAtAction() in this way
         // If we use CreatedAtRoute() we dont need to pass the action name or use this
         // But CreateAtRoute wasn't working for me
-        var action = nameof(GetItemAsync); 
+        var action = nameof(GetItemAsync);
 
         // Can use CreatedAtAction() or CreatedAtRoute()
         //return CreatedAtRoute(action, new {id = item.Id}, item.AsDto());
@@ -109,6 +110,4 @@ public class ItemsController : ControllerBase
         // It is convention to return NoContent() when deleting
         return NoContent(); // 204
     }
-
-
 }
