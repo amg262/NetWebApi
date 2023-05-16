@@ -33,6 +33,11 @@ docker ps -- checks if its running
 This line works with a new volume for this Auth DB - while saving old one. Needed to move the 'mongo' to the very end of the line.
 ```docker run -d --rm --name mongo -p 27017:27017  -v C:\ProgramData\docker\volumes\mongodbdataauth:C:\data\db -e MONGO_INITDB_ROOT_USERNAME=mongoadmin -e MONGO_INITDB_ROOT_PASSWORD=password mongo```
 
+Initialize secrets: 
+```dotnet user-secrets init --project .\Catalog\```
+```dotnet user-secrets set MongoDbSettings:Password password```
+
+
 ### Aysnchronous Programming
 https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/async/
 

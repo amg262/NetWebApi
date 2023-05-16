@@ -27,7 +27,9 @@ public class InMemItemsRepository : IItemsRepository
     public async Task CreateItemAsync(Item item)
     {
         items.Add(item);
+        
         await Task.CompletedTask; // Just return a completed task
+        
     }
 
     public async Task UpdateItemAsync(Item item)

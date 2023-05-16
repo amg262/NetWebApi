@@ -1,0 +1,18 @@
+version: '3.7'
+services:
+  database:
+    image: mongo
+    container_name : mongodbauthdata
+    command: mongod --auth
+    environment:
+      - MONGO_INITDB_DATABASE=catalog
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    ports:
+      - '27017-27019:27017-27019'
+    volumes:
+      - C:\ProgramData\docker\volumes\mongodbdataauth
+
+volumes:
+  mongodbdataauth:
+    driver: local
