@@ -2,7 +2,7 @@ version: '3.7'
 services:
   database:
     image: mongo
-    container_name : mongodbauthdata
+    container_name : mongo
     command: mongod --auth
     environment:
       - MONGO_INITDB_DATABASE=catalog

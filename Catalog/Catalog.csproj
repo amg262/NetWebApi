@@ -22,25 +22,7 @@
         <Content Remove=".vscode\**" />
         <Content Remove="prog\**" />
     </ItemGroup>
+    
 
-    <ItemGroup>
-        <Compile Remove=".vscode\**" />
-        <Compile Remove="prog\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <EmbeddedResource Remove=".vscode\**" />
-        <EmbeddedResource Remove="prog\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Remove=".vscode\**" />
-        <None Remove="prog\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="prog\3463463appsettings.Development.json" />
-      <_ContentIncludedByDefault Remove="prog\3463463appsettings.json" />
-    </ItemGroup>
 
 </Project>

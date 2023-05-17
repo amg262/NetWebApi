@@ -14,7 +14,7 @@ public class ItemsController : ControllerBase
     private readonly IItemsRepository _repository;
 
     // Dependency Injection
-    public ItemsController(IItemsRepository repository)
+    public ItemsController(IItemsRepository repository, ILogger<ItemsController> loggerStubObject)
     {
         this._repository = repository;
     }

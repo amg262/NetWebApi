@@ -60,7 +60,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddHealthChecks()
-    .AddMongoDb(mongoDbSettings.ConnectionString,
+    .AddMongoDb(mongoDbSettings?.ConnectionString,
         name: "mongodb",
         timeout: TimeSpan.FromSeconds(3),
         tags: new[] {"ready"}); // This is to check if the db is ready to accept requests
@@ -118,7 +118,9 @@ app.MapHealthChecks("/api/health/live", new HealthCheckOptions
 app.MapHealthChecksUI(options =>
 {
     options.UIPath = "/api/hc-ui";
-    //options.AddCustomStylesheet("./Customization/custom.css");
+    // options.AddCustomStylesheet("./Customization/custom.css");
 });
+
+app.MapControllers();
 
 app.Run();
