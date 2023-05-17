@@ -1,5 +1,8 @@
+using System.Net.Mime;
+using System.Text.Json;
 using Catalog.Repositories;
 using Catalog.Settings;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -18,11 +21,16 @@ BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
 
 BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
 
-// This is the line that adds the mongo client to the container
-builder.Services.AddSingleton<IMongoClient>(new MongoClient(builder.Configuration.GetSection(nameof(MongoDbSettings))
-    .Get<MongoDbSettings>()
-    ?.ConnectionString));
 
+var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
+// This is the line that adds the mongo client to the container |   OLD WAY 
+// builder.Services.AddSingleton<IMongoClient>(new MongoClient(builder.Configuration.GetSection(nameof(MongoDbSettings))
+//     .Get<MongoDbSettings>()?.ConnectionString));
+
+builder.Services.AddSingleton<IMongoClient>(serviceProvider =>
+{
+    return new MongoClient(mongoDbSettings?.ConnectionString);
+});
 
 // This is the line that adds the repository to the container
 builder.Services.AddSingleton<IItemsRepository, MongoDbItemsRepository>();
@@ -51,6 +59,13 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddHealthChecks()
+    .AddMongoDb(mongoDbSettings.ConnectionString,
+        name: "mongodb",
+        timeout: TimeSpan.FromSeconds(3),
+        tags: new[] {"ready"}); // This is to check if the db is ready to accept requests
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -66,6 +81,44 @@ app.UseAuthorization();
 
 //app.MapDefaultControllerRoute();
 app.UseCors("Local");
-app.MapControllers();
+
+
+// This checks if API is ready to accept requests
+app.MapHealthChecks("/api/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready"),
+    ResponseWriter = async (context, report) =>
+    {
+        var result = JsonSerializer.Serialize(
+            new
+            {
+                status = report.Status.ToString(),
+                checks = report.Entries.Select(entry => new
+                {
+                    name = entry.Key,
+                    status = entry.Value.Status.ToString(),
+                    exception = entry.Value.Exception != null ? entry.Value.Exception.Message : "none",
+                    duration = entry.Value.Duration.ToString()
+                })
+            }
+        );
+
+        context.Response.ContentType = MediaTypeNames.Application.Json;
+        await context.Response.WriteAsync(result);
+    }
+});
+
+// This checks if API is live
+app.MapHealthChecks("/api/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false,
+});
+
+// This is for the UI of the health checks
+app.MapHealthChecksUI(options =>
+{
+    options.UIPath = "/api/hc-ui";
+    //options.AddCustomStylesheet("./Customization/custom.css");
+});
 
 app.Run();
