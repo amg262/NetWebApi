@@ -45,6 +45,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "Catalog", Version = "v1"}); });
 
 
+// builder.Services.AddHealthChecksUI();
+
 // CORS - Cross Origin Resource Sharing - allows you to make requests from one domain to another
 builder.Services.AddCors(options =>
 {
@@ -114,11 +116,10 @@ app.MapHealthChecks("/api/health/live", new HealthCheckOptions
     Predicate = _ => false,
 });
 
-// This is for the UI of the health checks
 app.MapHealthChecksUI(options =>
 {
-    options.UIPath = "/api/hc-ui";
-    // options.AddCustomStylesheet("./Customization/custom.css");
+    options.UIPath = "/hc-ui";
+    options.ApiPath = "/hc-ui-api";
 });
 
 app.MapControllers();
