@@ -19,8 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-    </ItemGroup>
-    <ItemGroup>
         <Content Include=".vscode\launch.json" />
         <Content Include=".vscode\settings.json" />
         <Content Include=".vscode\tasks.json" />
