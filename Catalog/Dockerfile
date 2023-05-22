@@ -15,8 +15,8 @@ EXPOSE 443
 # We are combining build and publish into one step to reduce redundancy
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["Catalog/Catalog.csproj", "Catalog/"]
-RUN dotnet restore "Catalog/Catalog.csproj"
+COPY ["Catalog.csproj", "Catalog/"]
+RUN dotnet restore "Catalog.csproj" 
 COPY . .
 # From build to publish - Creates new folder called publish that it needs to execute the app
 RUN dotnet publish "Catalog.csproj" -c Release -o /app/publish /p:UseAppHost=false

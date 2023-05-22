@@ -13,8 +13,8 @@ EXPOSE 443
 # Copy the rest of the files and build the project
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["Catalog/Catalog.csproj", "Catalog/"]
-RUN dotnet restore "Catalog/Catalog.csproj"
+COPY ["Catalog.csproj", "./Catalog/"]
+RUN dotnet restore "Catalog.csproj"
 COPY . .
 WORKDIR "/src/Catalog"
 RUN dotnet build "Catalog.csproj" -c Release -o /app/build
