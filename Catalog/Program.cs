@@ -61,6 +61,13 @@ builder.Services.AddCors(options =>
         });
 });
 
+// Health checks
+builder.Services.AddHealthChecks()
+    .AddMongoDb(mongoDbSettings?.ConnectionString,
+        name: "mongodb",
+        timeout: TimeSpan.FromSeconds(3),
+        tags: new[] {"ready"}); // This is to check if the db is ready to accept requests
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -75,19 +82,11 @@ if (app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
-
 app.UseAuthorization();
+
 
 //app.MapDefaultControllerRoute();
 app.UseCors("Local");
-
-// Health checks
-builder.Services.AddHealthChecks()
-    .AddMongoDb(mongoDbSettings?.ConnectionString,
-        name: "mongodb",
-        timeout: TimeSpan.FromSeconds(3),
-        tags: new[] {"ready"}); // This is to check if the db is ready to accept requests
 
 
 // This checks if the db is ready to accept requests and gives a response
