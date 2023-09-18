@@ -120,12 +120,7 @@ app.MapHealthChecks("/api/health/live", new HealthCheckOptions
     Predicate = _ => false,
 });
 
-// This is for the UI
-app.MapHealthChecksUI(options =>
-{
-    options.UIPath = "/hc-ui";
-    options.ApiPath = "/hc-ui-api";
-});
+
 
 app.MapControllers();
 
